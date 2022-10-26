@@ -2,10 +2,12 @@ import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import { errorHandler } from "./middlewares";
 import { graphqlHTTP } from "express-graphql";
-import { testSchema } from "./graphql/schema";
-import { hello, root } from "./graphql/users/resolver";
+import { testSchema } from "./graphql";
+import { root } from "./graphql";
+import { buildSchema } from "graphql";
 
 const app: Express = express();
+
 const allowlist = ["http://localhost:3000", process.env.FRONT_END_URL];
 const corsOptionsDelegate = function (
     req: Request,

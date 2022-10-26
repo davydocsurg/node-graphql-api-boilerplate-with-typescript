@@ -1,30 +1,49 @@
-import { User, UserInput } from "../../types";
-import { users } from "../../mock/db";
+import { Query, Resolver, Mutation, Arg } from "type-graphql";
+import { User, UserInput } from "./users.schema";
 
-const getUser = (args: { id: number }): User | undefined =>
-    users.find((u) => u.id === args.id);
+@Resolver(() => User)
+export class UsersResolver {
+    private users: User[] = [
+        { id: 1, name: "John Doe", email: "johndoe@gmail.com" },
+        { id: 2, name: "Jane Doe", email: "janedoe@gmail.com" },
+        { id: 3, name: "Mike Doe", email: "mikedoe@gmail.com" },
+    ];
 
-const getUsers = (): User[] => users;
+    @Query(() => [User])
+    async getUsers(): Promise<User[]> {
+        return this.users;
+    }
 
-const createUser = (args: { input: UserInput }): User => {
-    const user = {
-        id: users.length + 1,
-        ...args.input,
-    };
-    users.push(user);
-    return user;
-};
+    @Query(() => User)
+    async getUser(@Arg("id") id: number): Promise<User | undefined> {
+        const user = this.users.find((u) => u.id === id);
+        return user;
+    }
 
-const updateUser = (args: { user: User }): User => {
-    const index = users.findIndex((u) => u.id === args.user.id);
-    const targetUser = users[index];
-    if (targetUser) users[index] = args.user;
-    return targetUser;
-};
+    @Mutation(() => User)
+    async createUser(@Arg("input") input: UserInput): Promise<User> {
+        const user = {
+            id: this.users.length + 1,
+            ...input,
+        };
+        this.users.push(user);
+        return user;
+    }
 
-export const root = {
-    getUser,
-    getUsers,
-    createUser,
-    updateUser,
-};
+    @Mutation(() => User)
+    async updateUser(
+        @Arg("id") id: number,
+        @Arg("input") input: UserInput
+    ): Promise<User> {
+        const user = this.users.find((u) => u.id === id);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        const updatedUser = {
+            ...user,
+            ...input,
+        };
+        this.users = this.users.map((u) => (u.id === id ? updatedUser : u));
+        return updatedUser;
+    }
+}

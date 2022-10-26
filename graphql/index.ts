@@ -1,4 +1,14 @@
-import { testSchema } from "./users/users.schema";
-import { root } from "./users/resolver";
+import { User, UserInput } from "./users/users.schema";
+import { UsersResolver } from "./users/resolver";
+import { buildSchema } from "type-graphql";
 
-export { testSchema, root };
+const resolveSchema = async () => {
+    const schema = await buildSchema({
+        resolvers: [UsersResolver],
+        emitSchemaFile: true,
+    });
+
+    return schema;
+};
+
+export { User, UserInput, UsersResolver, resolveSchema };

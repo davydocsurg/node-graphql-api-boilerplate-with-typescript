@@ -1,21 +1,19 @@
-import { buildSchema } from "graphql";
+import { Field, ObjectType, InputType } from "type-graphql";
 
-export const testSchema = buildSchema(`
-    input UserInput {
-        email: String!
-        name: String!
-    }
-    type User {
-        id: Int!
-        name: String!
-        email: String!
-    }
-    type Mutation {
-        createUser(input: UserInput): User
-        updateUser(id: Int!, input: UserInput): User
-    }
-    type Query {
-        getUser(id: String): User
-        getUsers: [User]
-    }
-`);
+@ObjectType()
+export class User {
+    @Field()
+    id!: number;
+    @Field()
+    name!: string;
+    @Field()
+    email!: string;
+}
+
+@InputType()
+export class UserInput implements Pick<User, "name" | "email"> {
+    @Field()
+    name!: string;
+    @Field()
+    email!: string;
+}
